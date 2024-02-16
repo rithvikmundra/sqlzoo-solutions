@@ -162,7 +162,7 @@ from nobel
 where subject = 'literature'
 and yr between 1980 and 1989;
 ```
-6.Only Presidents
+6. Only Presidents
 ```sql
 select *
 from nobel
@@ -205,7 +205,7 @@ select *
 from nobel 
 where yr >= 2004 and subject= 'literature';
 ```
-### Harder Questions
+#### Harder Questions
 11. Umlaut
 ```sql
 select *
@@ -427,7 +427,7 @@ from game join goal
 on id = matchid
 where stadium = 'National Stadium, Warsaw';
 ```
-### More Difficult Questions....
+#### More Difficult Questions
 8.
 ```sql
 SELECT distinct player
@@ -563,7 +563,7 @@ join actor a
 on a.id = actorid
 where yr = 1962 and ord=1;
 ```
-### Harder Questions
+#### Harder Questions
 
 11. Busy years for Rock Hudson
 ```sql
@@ -644,81 +644,152 @@ and a.name != 'Art Garfunkel';
 ## Using NULL
 1.
 ```sql
-
+select name
+from teacher 
+where dept is null;
 ```
 2.
 ```sql
+SELECT teacher.name, dept.name
+ FROM teacher INNER JOIN dept
+           ON (teacher.dept=dept.id);
 
 ```
 3.
 ```sql
-
+select t.name, d.name
+from teacher t left join dept d 
+on t.dept = d.id;
 ```
 4.
 ```sql
-
+select t.name, d.name
+from dept d  left join teacher t
+on t.dept = d.id;
 ```
 5.
 ```sql
+select name, coalesce(mobile, '07986 444 2266')
+from teacher;
 ```
 6.
 ```sql
-
+select t.name, coalesce(d.name, 'None')
+from teacher t left join dept d 
+on t.dept = d.id;
 ```
 7.
 ```sql
-
+select count(name), count(mobile)
+from teacher;
 ```
 8.
 ```sql
-
+select d.name, count(t.name)
+from teacher t right join dept d 
+on t.dept = d.id
+group by d.name;
 ```
 9.
 ```sql
-
+select t.name,
+case when dept in (1,2) then 'Sci'
+else 'Art' end as new_name
+from teacher t left join dept d 
+on t.dept = d.id;
 ```
 10.
 ```sql
-
+select t.name,
+case when dept in (1,2) then 'Sci'
+when dept = 3 then 'Art' 
+else 'None' end as new_name
+from teacher t left join dept d 
+on t.dept = d.id;
 ```
 ## Self JOIN
 1.
 ```sql
-
+select count(id) 
+from stops;
 ```
 2.
 ```sql
-
+select id 
+from stops 
+where name = 'Craiglockhart';
 ```
 3.
 ```sql
+SELECT id, name 
+FROM stops, route
+WHERE stops.id = route.stop
+AND num = '4'
+AND company = 'LRT';
 
 ```
 4.
 ```sql
+SELECT company, num, COUNT(*)
+FROM route WHERE stop=149 OR stop=53
+GROUP BY company, num
+having  COUNT(*)>=2;
 
 ```
 5.
 ```sql
+SELECT a.company, a.num, a.stop, b.stop
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+WHERE a.stop=53 and b.stop= 149;
 
 ```
 6.
 ```sql
+SELECT a.company, a.num, stopa.name, stopb.name
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart'
+and stopb.name = 'London Road';
 
 ```
 7.
 ```sql
-
+select distinct  a.company, a.num
+from route a join route b
+on a.num = b.num and a.company = b.company
+where a.stop = 115 and b.stop = 137;
 ```
 8.
 ```sql
-
+select distinct  a.company, a.num
+from route a join route b
+on a.num = b.num and a.company = b.company
+join stops s1 on s1.id = a.stop
+join stops s2 on s2.id = b.stop
+where s1.name = 'Craiglockhart'  and s2.name = 'Tollcross';
 ```
 9.
 ```sql
-
+select distinct  s2.name, a.company, a.num
+from route a join route b
+on a.num = b.num and a.company = b.company
+join stops s1 on s1.id = a.stop
+join stops s2 on s2.id = b.stop
+where s1.name = 'Craiglockhart';
 ```
 10.
 ```sql
-
+select r1.num, r1.company,s2.name, r3.num, r3.company 
+from route r1 join route r2
+on r1.num=r2.num and r1.company = r2.company 
+join stops s1 on r1.stop = s1.id 
+join stops s2 on r2.stop=s2.id
+join route r3 on r3.stop = r2.stop
+join route r4 on r4.num = r3.num and r4.company = r3.company
+join stops s3 on r4.stop = s3.id
+where s1.name = 'Craiglockhart' and s3.name = 'Lochend'
+order by r1.num, r1.company, s2.name, r3.num, r3.company;
 ```
